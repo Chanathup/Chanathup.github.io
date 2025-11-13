@@ -1,0 +1,50 @@
+body {
+  font-family: "Prompt", sans-serif;
+  text-align: center;
+  background-color: #f0f6ff;
+}
+
+#game {
+  display: inline-block;
+  margin-top: 20px;
+}
+
+#buttons {
+  margin-bottom: 10px;
+}
+
+button {
+  margin: 5px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(7, 60px);
+  grid-template-rows: repeat(6, 60px);
+  gap: 5px;
+  background-color: #3b7dd8;
+  padding: 10px;
+  border-radius: 10px;
+  justify-content: center;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.red {
+  background-color: red;
+}
+
+.yellow {
+  background-color: yellow;
+}
