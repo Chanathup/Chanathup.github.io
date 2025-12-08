@@ -40,10 +40,10 @@ function dropPiece(c) {
       const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
       cell.classList.add(currentPlayer);
       if (checkWin(r, c)) {
-        setTimeout(() => alert(`🎉 ผู้เล่น ${currentPlayer === "red" ? "🔴" : "🟡"} ชนะ!`), 100);
+        setTimeout(() => alert(`🎉 ผู้เล่น ${currentPlayer === "red" ? "🔴" : "🔴"} ชนะ!`), 100);
       }
       currentPlayer = currentPlayer === "red" ? "yellow" : "red";
-      playerText.textContent = currentPlayer === "red" ? "🔴" : "🟡";
+      playerText.textContent = currentPlayer === "red" ? "🟡" : "🟡";
       break;
     }
   }
