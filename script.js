@@ -43,7 +43,7 @@ function dropPiece(c) {
         setTimeout(() => alert(`🎉 ผู้เล่น ${currentPlayer === "red" ? "🔴" : "🔴"} ชนะ!`), 100);
       }
       currentPlayer = currentPlayer === "red" ? "yellow" : "red";
-      playerText.textContent = currentPlayer === "red" ? "🟡" : "🟡";
+      playerText.textContent = currentPlayer === "yellow" ? "🟡" : "🟡";
       break;
     }
   }
