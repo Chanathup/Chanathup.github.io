@@ -1,112 +1,50 @@
-/* การตั้งค่าพื้นฐาน */
 body {
-    font-family: 'Arial', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #f4f7f6; /* สีพื้นหลังอ่อน */
+  font-family: "Prompt", sans-serif;
+  text-align: center;
+  background-color: #f0f6ff;
 }
 
-.game-container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
+#game {
+  display: inline-block;
+  margin-top: 20px;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
+#buttons {
+  margin-bottom: 10px;
 }
 
-/* กระดานเกม */
-.board {
-    display: grid;
-    grid-template-columns: repeat(7, 60px); /* 7 คอลัมน์ */
-    grid-template-rows: repeat(6, 60px);    /* 6 แถว */
-    gap: 5px;
-    background-color: #2a61a7; /* สีน้ำเงินเหมือนกระดาน */
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
+button {
+  margin: 5px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(7, 60px);
+  grid-template-rows: repeat(6, 60px);
+  gap: 5px;
+  background-color: #3b7dd8;
+  padding: 10px;
+  border-radius: 10px;
+  justify-content: center;
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
-    background-color: #ffffff; /* ช่องว่างสีขาว */
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
-    /* ตำแหน่งสำหรับแอนิเมชันการตก */
-    position: relative;
-    overflow: hidden; 
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ชิปที่ถูกวาง */
-.chip {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    position: absolute;
-    bottom: 0; /* เริ่มต้นที่ด้านล่างของเซลล์ */
-    left: 0;
-    transform: translateY(-100%); /* ซ่อนไว้ด้านบน */
-    animation: drop 0.5s forwards cubic-bezier(0.5, 0, 0.5, 1.5); /* แอนิเมชันการตก */
+.red {
+  background-color: red;
 }
 
-/* สีของชิป */
-.player1 { background-color: #e74c3c; } /* แดง */
-.player2 { background-color: #f1c40f; } /* เหลือง */
-
-/* แอนิเมชันการตก */
-@keyframes drop {
-    to { transform: translateY(0); }
-}
-
-/* การแสดงสถานะ */
-.status-message {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #4a4a4a;
-}
-
-/* คะแนน */
-.scoreboard {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px;
-    background-color: #ecf0f1;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.scoreboard p {
-    margin: 0;
-    font-weight: 500;
-}
-
-#score-player1 { color: #e74c3c; font-weight: bold; }
-#score-player2 { color: #f1c40f; font-weight: bold; }
-
-/* ปุ่ม */
-#reset-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#reset-button:hover {
-    background-color: #2980b9;
+.yellow {
+  background-color: yellow;
 }
