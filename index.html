@@ -1,31 +1,22 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Four (4-in-a-Row)</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บอร์ดเกม 4 in row</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Connect Four (4-in-a-Row)</h1>
-        
-        <div id="scoreboard" class="scoreboard">
-            <p>ผู้เล่น 1 (แดง): <span id="score-player1">0</span> / 3</p>
-            <p>ผู้เล่น 2 (เหลือง): <span id="score-player2">0</span> / 3</p>
-        </div>
+  <h1>บอร์ดเกม 4 in row</h1>
 
-        <div id="status" class="status-message">ตาของผู้เล่น 1 (แดง)</div>
-        
-        <div id="board" class="board">
-            </div>
+  <div id="game">
+    <div id="current-player">ผู้เล่น: <span id="player">🔴</span></div>
+    <div id="buttons"></div>
+    <div id="board"></div>
+  </div>
 
-        <button id="reset-button">เริ่มเกมใหม่</button>
-    </div>
+  <button onclick="resetGame()">เริ่มใหม่</button>
 
-    <audio id="drop-sound" src="drop.mp3" preload="auto"></audio>
-    <audio id="win-sound" src="win.mp3" preload="auto"></audio>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
