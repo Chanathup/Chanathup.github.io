@@ -1,50 +1,173 @@
+:root {
+  --board-color: #3b82f6;
+  --board-shadow: #1e40af;
+  --bg-color: #f0f9ff;
+  --red-piece: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
+  --yellow-piece: radial-gradient(circle at 30% 30%, #feca57, #f39c12);
+  --hole-shadow: inset 3px 3px 5px rgba(0,0,0,0.4);
+}
+
 body {
   font-family: "Prompt", sans-serif;
   text-align: center;
-  background-color: #f0f6ff;
+  background-color: var(--bg-color);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-#game {
+.container {
+  max-width: 600px;
+  width: 100%;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Status Bar & Reset Button */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+#current-player-display {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.player-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   display: inline-block;
-  margin-top: 20px;
+  margin-left: 10px;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+.player-dot.red { background: var(--red-piece); }
+.player-dot.yellow { background: var(--yellow-piece); }
+
+.reset-btn {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Prompt", sans-serif;
+  transition: transform 0.1s, background-color 0.2s;
 }
 
-#buttons {
+.reset-btn:hover { background-color: #2c3e50; }
+.reset-btn:active { transform: scale(0.95); }
+
+/* Game Area */
+#game-area {
+  position: relative;
+  display: inline-block;
+  background-color: var(--board-color);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 10px 0 var(--board-shadow);
+}
+
+/* Drop Buttons (Arrows) */
+#buttons-layer {
+  display: grid;
+  grid-template-columns: repeat(7, 60px);
+  gap: 8px;
   margin-bottom: 10px;
 }
 
-button {
-  margin: 5px;
-  padding: 6px 12px;
-  font-size: 14px;
+.column-btn {
+  width: 60px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
 }
 
+.column-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+.column-btn:active { transform: translateY(0); }
+.column-btn::after { content: "▼"; }
+
+/* Board Grid */
 #board {
   display: grid;
   grid-template-columns: repeat(7, 60px);
   grid-template-rows: repeat(6, 60px);
-  gap: 5px;
-  background-color: #3b7dd8;
-  padding: 10px;
-  border-radius: 10px;
-  justify-content: center;
+  gap: 8px;
 }
 
 .cell {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: white;
+  background-color: #bg-color; /* Matches body bg to look like a hole */
+  background: white; /* Fallback */
+  box-shadow: var(--hole-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden; /* For animation containment */
 }
 
-.red {
-  background-color: red;
+/* Pieces */
+.piece {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translateY(-300px); /* Start above */
+  animation: dropIn 0.5s ease-out forwards;
 }
 
-.yellow {
-  background-color: yellow;
+.cell.red .piece { background: var(--red-piece); }
+.cell.yellow .piece { background: var(--yellow-piece); }
+
+@keyframes dropIn {
+  0% { transform: translateY(-400px); }
+  60% { transform: translateY(10px); }
+  80% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+/* Winner Message */
+#winner-message {
+  background-color: #27ae60;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  animation: popIn 0.3s ease-out;
+}
+
+#winner-message.hidden { display: none; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
