@@ -1,207 +1,112 @@
-:root {
-    /* --- Dark Mode (Default) Variables --- */
-    --bg-color: #1e293b;
-    --text-color: #f1f5f9;
-    --board-color: #334155;
-    --slot-empty: #0f172a;
-    --score-bg: rgba(255, 255, 255, 0.05);
-    --shadow-color: rgba(0,0,0,0.5);
-    
-    /* Player Colors */
-    --p1-color: #ef4444; /* Red */
-    --p1-glow: rgba(239, 68, 68, 0.6);
-    --p2-color: #fbbf24; /* Yellow */
-    --p2-glow: rgba(251, 191, 36, 0.6);
-    
-    --btn-gradient: linear-gradient(135deg, #6366f1, #4f46e5);
-}
-
-/* --- Light Mode Variables --- */
-body.light-mode {
-    --bg-color: #f0f2f5;
-    --text-color: #1e293b;
-    --board-color: #cbd5e1;
-    --slot-empty: #ffffff;
-    --score-bg: rgba(255, 255, 255, 0.8);
-    --shadow-color: rgba(0,0,0,0.15);
-}
-
+/* การตั้งค่าพื้นฐาน */
 body {
-    font-family: 'Kanit', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Arial', sans-serif;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
-    transition: background-color 0.3s, color 0.3s;
+    background-color: #f4f7f6; /* สีพื้นหลังอ่อน */
+}
+
+.game-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 h1 {
-    margin-bottom: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Theme Toggle Button */
-.theme-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 8px 15px;
-    background: transparent;
-    border: 2px solid var(--text-color);
-    color: var(--text-color);
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-}
-
-.theme-btn:hover {
-    background: var(--text-color);
-    color: var(--bg-color);
-}
-
-/* Scoreboard */
-.scoreboard {
-    display: flex;
-    gap: 2rem;
+    color: #333;
     margin-bottom: 20px;
-    background: var(--score-bg);
-    padding: 15px 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px var(--shadow-color);
-    backdrop-filter: blur(5px);
 }
 
-.player-score {
-    text-align: center;
-    position: relative;
-    padding: 0 10px;
-}
-
-.player-score h3 { margin: 0; font-size: 1rem; opacity: 0.9; }
-.score-count { font-size: 2.5rem; font-weight: bold; margin: 5px 0; }
-
-.vs-area { text-align: center; display: flex; flex-direction: column; justify-content: center; opacity: 0.7; }
-.sub-text { font-size: 0.8rem; margin-top: 5px; }
-
-.indicator {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 8px;
-}
-.p1-indic { background-color: var(--p1-color); box-shadow: 0 0 8px var(--p1-glow); }
-.p2-indic { background-color: var(--p2-color); box-shadow: 0 0 8px var(--p2-glow); }
-
-.active-turn {
-    border-bottom: 3px solid var(--text-color);
-}
-
-/* Game Board */
-.game-board {
-    background-color: var(--board-color);
-    padding: 15px;
-    border-radius: 20px;
-    box-shadow: 0 15px 30px var(--shadow-color), inset 0 2px 5px rgba(255,255,255,0.1);
+/* กระดานเกม */
+.board {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    transition: background-color 0.3s;
+    grid-template-columns: repeat(7, 60px); /* 7 คอลัมน์ */
+    grid-template-rows: repeat(6, 60px);    /* 6 แถว */
+    gap: 5px;
+    background-color: #2a61a7; /* สีน้ำเงินเหมือนกระดาน */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
 }
 
 .cell {
-    width: 50px; height: 50px;
-    background-color: var(--slot-empty);
+    width: 60px;
+    height: 60px;
+    background-color: #ffffff; /* ช่องว่างสีขาว */
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+    /* ตำแหน่งสำหรับแอนิเมชันการตก */
     position: relative;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
-    transition: transform 0.1s, background-color 0.3s;
+    overflow: hidden; 
 }
 
-.cell:hover {
-    transform: scale(1.05);
-}
-
-/* Pieces */
-.piece {
-    width: 100%; height: 100%;
+/* ชิปที่ถูกวาง */
+.chip {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     position: absolute;
-    top: 0; left: 0;
-    transform: translateY(-500px);
-    animation: dropIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    bottom: 0; /* เริ่มต้นที่ด้านล่างของเซลล์ */
+    left: 0;
+    transform: translateY(-100%); /* ซ่อนไว้ด้านบน */
+    animation: drop 0.5s forwards cubic-bezier(0.5, 0, 0.5, 1.5); /* แอนิเมชันการตก */
 }
 
-.piece.red {
-    background: radial-gradient(circle at 35% 35%, #ff9999, var(--p1-color));
-    box-shadow: 0 0 15px var(--p1-glow);
+/* สีของชิป */
+.player1 { background-color: #e74c3c; } /* แดง */
+.player2 { background-color: #f1c40f; } /* เหลือง */
+
+/* แอนิเมชันการตก */
+@keyframes drop {
+    to { transform: translateY(0); }
 }
 
-.piece.yellow {
-    background: radial-gradient(circle at 35% 35%, #ffeecc, var(--p2-color));
-    box-shadow: 0 0 15px var(--p2-glow);
-}
-
-@keyframes dropIn { to { transform: translateY(0); } }
-
-/* Controls */
-#status {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    min-height: 1.5em;
-    opacity: 0.8;
-}
-
-.action-btn {
-    margin-top: 20px;
-    padding: 12px 30px;
-    font-family: 'Kanit', sans-serif;
-    font-size: 1rem;
+/* การแสดงสถานะ */
+.status-message {
+    font-size: 1.2em;
     font-weight: bold;
+    margin-bottom: 15px;
+    color: #4a4a4a;
+}
+
+/* คะแนน */
+.scoreboard {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.scoreboard p {
+    margin: 0;
+    font-weight: 500;
+}
+
+#score-player1 { color: #e74c3c; font-weight: bold; }
+#score-player2 { color: #f1c40f; font-weight: bold; }
+
+/* ปุ่ม */
+#reset-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #3498db;
     color: white;
-    background: var(--btn-gradient);
     border: none;
-    border-radius: 50px;
+    border-radius: 5px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
-    transition: transform 0.2s;
+    transition: background-color 0.3s;
 }
 
-.action-btn:hover { transform: translateY(-2px); }
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    background: var(--bg-color);
-    color: var(--text-color);
-    padding: 40px;
-    border-radius: 20px;
-    text-align: center;
-    border: 2px solid #4f46e5;
-    box-shadow: 0 0 40px rgba(79, 70, 229, 0.4);
-}
-
-.modal h2 { font-size: 2.5rem; margin: 0 0 10px 0; }
-
-@media (max-width: 600px) {
-    .cell { width: 40px; height: 40px; }
-    .scoreboard { gap: 1rem; padding: 10px 15px; }
-    h1 { font-size: 1.5rem; }
+#reset-button:hover {
+    background-color: #2980b9;
 }
