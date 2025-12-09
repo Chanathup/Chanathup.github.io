@@ -1,207 +1,214 @@
-// --- Constants & Variables ---
+// ขนาดกระดาน
 const ROWS = 6;
 const COLS = 7;
-let board = [];
-let currentPlayer = 1; // 1 = Red, 2 = Yellow
-let scores = { 1: 0, 2: 0 };
-let gameActive = true;
-let isProcessing = false;
 
-// --- Audio System ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// สถานะเกม
+let board;
+let currentPlayer = 1; // 1 = แดง, 2 = เหลือง
+let isGameOver = false;
 
-function playTone(freq, type, duration) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-}
+// คะแนนรวม
+let scores = {
+    player1: 0,
+    player2: 0
+};
+const MAX_SCORE = 2; // ชนะ 2 ใน 3
 
-function playDropSound() {
-    playTone(600, 'sine', 0.1);
-    setTimeout(() => playTone(400, 'triangle', 0.2), 50);
-}
+// ตัวแปร DOM
+const boardElement = document.getElementById('board');
+const statusElement = document.getElementById('status');
+const resetButton = document.getElementById('reset-button');
+const scorePlayer1Element = document.getElementById('score-player1');
+const scorePlayer2Element = document.getElementById('score-player2');
+const dropSound = document.getElementById('drop-sound'); // ต้องเพิ่มไฟล์ drop.mp3
+const winSound = document.getElementById('win-sound');   // ต้องเพิ่มไฟล์ win.mp3
 
-function playWinSound() {
-    playTone(400, 'square', 0.1);
-    setTimeout(() => playTone(500, 'square', 0.1), 150);
-    setTimeout(() => playTone(600, 'square', 0.2), 300);
-    setTimeout(() => playTone(800, 'square', 0.4), 450);
-}
+// --- ฟังก์ชันหลักของเกม ---
 
-// --- Game Logic ---
-
-function initGame() {
-    const boardEl = document.getElementById('board');
-    boardEl.innerHTML = '';
+/**
+ * เริ่มต้น/รีเซ็ตสถานะกระดาน
+ */
+function initializeBoard() {
     board = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
-    
-    // สร้างกระดาน
+    boardElement.innerHTML = ''; // ล้างกระดาน
+    isGameOver = false;
+    currentPlayer = 1; // เริ่มที่ผู้เล่น 1 เสมอ
+
+    // สร้างเซลล์กระดาน
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             cell.dataset.row = r;
             cell.dataset.col = c;
-            cell.onclick = () => handleMove(c);
-            boardEl.appendChild(cell);
+            cell.addEventListener('click', () => handleTurn(c));
+            boardElement.appendChild(cell);
         }
     }
-    gameActive = true;
-    isProcessing = false;
     updateStatus();
-    highlightActivePlayer();
+    updateScoreboard();
 }
 
-function handleMove(col) {
-    if (!gameActive || isProcessing) return;
+/**
+ * จัดการเมื่อผู้เล่นคลิกคอลัมน์
+ * @param {number} colIndex - ดัชนีคอลัมน์ที่ถูกคลิก
+ */
+function handleTurn(colIndex) {
+    if (isGameOver) return;
 
-    // หาแถวล่างสุดที่ว่าง
-    let rowToPlace = -1;
+    // หาแถวที่ต่ำที่สุดในคอลัมน์นั้นที่ยังว่างอยู่
+    let rowIndex = -1;
     for (let r = ROWS - 1; r >= 0; r--) {
-        if (board[r][col] === 0) {
-            rowToPlace = r;
+        if (board[r][colIndex] === 0) {
+            rowIndex = r;
             break;
         }
     }
 
-    if (rowToPlace === -1) return; // แถวเต็ม
+    if (rowIndex !== -1) {
+        // 1. วางชิปในตารางข้อมูล
+        board[rowIndex][colIndex] = currentPlayer;
 
-    isProcessing = true;
-    board[rowToPlace][col] = currentPlayer;
-    
-    // Animation
-    const index = rowToPlace * COLS + col;
-    const cell = document.getElementById('board').children[index];
-    const piece = document.createElement('div');
-    piece.classList.add('piece', currentPlayer === 1 ? 'red' : 'yellow');
-    cell.appendChild(piece);
-    
-    playDropSound();
+        // 2. อัปเดต UI และเล่นเสียง
+        placeChip(rowIndex, colIndex, currentPlayer);
+        // dropSound.play(); // ยกเลิกการคอมเมนต์เมื่อเพิ่มไฟล์เสียง
 
-    setTimeout(() => {
-        if (checkWin(rowToPlace, col)) {
-            handleRoundWin();
-        } else if (checkDraw()) {
-            document.getElementById('status').textContent = "เสมอ! (Draw)";
-            gameActive = false;
-        } else {
-            currentPlayer = currentPlayer === 1 ? 2 : 1;
-            updateStatus();
-            highlightActivePlayer();
-            isProcessing = false;
+        // 3. ตรวจสอบผู้ชนะ
+        if (checkWin(rowIndex, colIndex)) {
+            endGame(currentPlayer);
+            return;
         }
-    }, 500);
+
+        // 4. ตรวจสอบการเสมอ
+        if (checkTie()) {
+            endGame(0); // 0 คือเสมอ
+            return;
+        }
+
+        // 5. สลับผู้เล่น
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        updateStatus();
+    }
 }
 
+/**
+ * อัปเดต UI ด้วยการวางชิปแบบมีแอนิเมชัน
+ * @param {number} r - แถว
+ * @param {number} c - คอลัมน์
+ * @param {number} player - ผู้เล่น (1 หรือ 2)
+ */
+function placeChip(r, c, player) {
+    const cell = boardElement.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+    const chip = document.createElement('div');
+    chip.classList.add('chip', `player${player}`);
+    
+    // แอนิเมชันจะถูกจัดการด้วย CSS (drop keyframes)
+    // การเพิ่มชิปเข้าไปในเซลล์จะทำให้เกิดแอนิเมชัน
+    cell.appendChild(chip);
+}
+
+/**
+ * ตรวจสอบว่ามีผู้ชนะหรือไม่ ณ ตำแหน่งที่วางล่าสุด
+ */
 function checkWin(r, c) {
-    const directions = [
-        [[0, 1], [0, -1]], // แนวนอน
-        [[1, 0], [-1, 0]], // แนวตั้ง
-        [[1, 1], [-1, -1]], // เฉียง \
-        [[1, -1], [-1, 1]]  // เฉียง /
-    ];
-
-    const player = board[r][c];
-
-    for (let axis of directions) {
-        let count = 1;
-        for (let dir of axis) {
-            let nr = r + dir[0];
-            let nc = c + dir[1];
-            while (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === player) {
+    const p = board[r][c]; // ผู้เล่นปัจจุบัน
+    
+    // ฟังก์ชันย่อยสำหรับตรวจสอบ 4 แนว (แนวนอน, แนวตั้ง, แนวทแยง 2 แบบ)
+    const checkLine = (r, c, dr, dc) => {
+        let count = 0;
+        // ตรวจสอบไปทิศทางหนึ่ง
+        for (let i = -3; i <= 3; i++) {
+            const nr = r + i * dr;
+            const nc = c + i * dc;
+            
+            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === p) {
                 count++;
-                nr += dir[0];
-                nc += dir[1];
+            } else {
+                count = 0; // รีเซ็ตหากไม่ต่อเนื่อง
             }
+            if (count >= 4) return true;
         }
-        if (count >= 4) return true;
-    }
-    return false;
+        return false;
+    };
+
+    // ตรวจสอบทุกทิศทาง
+    return checkLine(r, c, 0, 1) || // แนวนอน
+           checkLine(r, c, 1, 0) || // แนวตั้ง
+           checkLine(r, c, 1, 1) || // แนวทแยงลงขวา
+           checkLine(r, c, 1, -1);  // แนวทแยงลงซ้าย
 }
 
-function checkDraw() {
-    return board[0].every(cell => cell !== 0);
+/**
+ * ตรวจสอบการเสมอ (กระดานเต็ม)
+ */
+function checkTie() {
+    return board.every(row => row.every(cell => cell !== 0));
 }
 
-function handleRoundWin() {
-    gameActive = false;
-    playWinSound();
-    scores[currentPlayer]++;
-    updateScoreBoard();
+/**
+ * จบเกมและอัปเดตคะแนน
+ * @param {number} winner - ผู้ชนะ (1, 2, หรือ 0 สำหรับเสมอ)
+ */
+function endGame(winner) {
+    isGameOver = true;
     
-    const colorName = currentPlayer === 1 ? "สีแดง" : "สีเหลือง";
-    
-    if (scores[currentPlayer] >= 2) {
-        // Grand Winner
-        const winText = document.getElementById('winnerText');
-        winText.textContent = `ผู้เล่น ${colorName} ชนะเลิศ!`;
-        winText.style.color = currentPlayer === 1 ? 'var(--p1-color)' : 'var(--p2-color)';
-        document.getElementById('winModal').style.display = 'flex';
+    if (winner === 1 || winner === 2) {
+        // winSound.play(); // ยกเลิกการคอมเมนต์เมื่อเพิ่มไฟล์เสียง
+        statusElement.textContent = `🎉 ผู้เล่น ${winner === 1 ? '1 (แดง)' : '2 (เหลือง)'} ชนะรอบนี้! 🎉`;
+        
+        // อัปเดตคะแนน
+        if (winner === 1) {
+            scores.player1++;
+        } else {
+            scores.player2++;
+        }
+        updateScoreboard();
+
+        // ตรวจสอบผู้ชนะรวม (2 ใน 3)
+        if (scores.player1 >= MAX_SCORE || scores.player2 >= MAX_SCORE) {
+            statusElement.textContent = `🏆 ผู้ชนะการแข่งขันคือ ผู้เล่น ${winner === 1 ? '1 (แดง)' : '2 (เหลือง)'}!! 🏆`;
+            resetButton.textContent = 'เริ่มการแข่งขันใหม่'; // เปลี่ยนปุ่มเป็นรีเซ็ตทั้งหมด
+        } else {
+            // พร้อมเริ่มรอบต่อไป
+            setTimeout(() => {
+                if (!isGameOver) return; // ป้องกันการรีเซ็ตทันทีหากผู้เล่นกดรีเซ็ตเอง
+                statusElement.textContent += ' (กำลังเริ่มรอบใหม่...)';
+                setTimeout(initializeBoard, 2000); // หน่วงเวลาเล็กน้อยก่อนเริ่มรอบใหม่
+            }, 1000);
+        }
+
     } else {
-        document.getElementById('status').textContent = `จบเกม! ${colorName} ชนะรอบนี้ (แต้ม 2 ใน 3)`;
-    }
-    isProcessing = false;
-}
-
-function updateScoreBoard() {
-    document.getElementById('score1').textContent = scores[1];
-    document.getElementById('score2').textContent = scores[2];
-}
-
-function highlightActivePlayer() {
-    const p1Area = document.getElementById('p1-area');
-    const p2Area = document.getElementById('p2-area');
-    if (currentPlayer === 1) {
-        p1Area.classList.add('active-turn');
-        p2Area.classList.remove('active-turn');
-    } else {
-        p2Area.classList.add('active-turn');
-        p1Area.classList.remove('active-turn');
+        statusElement.textContent = 'เสมอ! กระดานเต็ม';
     }
 }
 
+/**
+ * อัปเดตข้อความสถานะการเล่น
+ */
 function updateStatus() {
-    const color = currentPlayer === 1 ? 'สีแดง' : 'สีเหลือง';
-    document.getElementById('status').textContent = `ตาของ ${color} เดิน...`;
+    statusElement.textContent = `ตาของผู้เล่น ${currentPlayer === 1 ? '1 (แดง)' : '2 (เหลือง)'}`;
 }
 
-function resetGame() {
-    document.getElementById('winModal').style.display = 'none';
-    initGame();
+/**
+ * อัปเดตการแสดงผลคะแนน
+ */
+function updateScoreboard() {
+    scorePlayer1Element.textContent = scores.player1;
+    scorePlayer2Element.textContent = scores.player2;
 }
 
-function resetMatch() {
-    scores = { 1: 0, 2: 0 };
-    currentPlayer = 1;
-    updateScoreBoard();
-    resetGame();
-}
+// --- การจัดการเหตุการณ์และเริ่มต้น ---
 
-// --- Theme Toggle ---
-function toggleTheme() {
-    const body = document.body;
-    const btn = document.getElementById('theme-toggle');
-    body.classList.toggle('light-mode');
-    
-    if (body.classList.contains('light-mode')) {
-        btn.textContent = '🌙 โหมดมืด';
-    } else {
-        btn.textContent = '☀️ โหมดสว่าง';
+// เหตุการณ์ปุ่มรีเซ็ต
+resetButton.addEventListener('click', () => {
+    // หากมีผู้ชนะรวมแล้ว ให้รีเซ็ตคะแนนทั้งหมด
+    if (scores.player1 >= MAX_SCORE || scores.player2 >= MAX_SCORE) {
+        scores.player1 = 0;
+        scores.player2 = 0;
+        resetButton.textContent = 'เริ่มเกมใหม่';
     }
-}
+    initializeBoard();
+});
 
-// --- Event Listeners ---
-document.getElementById('reset-btn').addEventListener('click', resetGame);
-document.getElementById('new-match-btn').addEventListener('click', resetMatch);
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-
-// Start
-initGame();
+// เริ่มเกมครั้งแรก
+initializeBoard();
