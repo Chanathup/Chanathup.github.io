@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>บอร์ดเกม 4 in row</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect 4 - เรียง 4 ตัว</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>บอร์ดเกม 4 in row</h1>
 
-  <div id="game">
-    <div id="current-player">ผู้เล่น: <span id="player">🔴</span></div>
-    <div id="buttons"></div>
-    <div id="board"></div>
+  <div class="container">
+    <h1>Connect 4 (เรียง 4 ตัว)</h1>
+    
+    <div class="status-bar">
+      <div id="current-player-display">
+        ตานี้: <span id="player-indicator" class="player-dot red"></span>
+      </div>
+      <button onclick="resetGame()" class="reset-btn">🔄 เริ่มเกมใหม่</button>
+    </div>
+
+    <div id="winner-message" class="hidden"></div>
+
+    <div id="game-area">
+      <div id="buttons-layer"></div>
+      <div id="board"></div>
+    </div>
   </div>
-
-  <button onclick="resetGame()">เริ่มใหม่</button>
 
   <script src="script.js"></script>
 </body>
