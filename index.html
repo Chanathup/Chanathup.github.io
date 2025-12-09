@@ -3,44 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมเรียง 4 (Connect 4)</title>
+    <title>Connect Four (4-in-a-Row)</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <button id="theme-toggle" class="theme-btn">☀️ โหมดสว่าง</button>
-
-    <h1>Connect 4</h1>
-
-    <div class="scoreboard">
-        <div id="p1-area" class="player-score active-turn">
-            <h3><span class="indicator p1-indic"></span>แดง</h3>
-            <div id="score1" class="score-count">0</div>
+    <div class="game-container">
+        <h1>Connect Four (4-in-a-Row)</h1>
+        
+        <div id="scoreboard" class="scoreboard">
+            <p>ผู้เล่น 1 (แดง): <span id="score-player1">0</span> / 3</p>
+            <p>ผู้เล่น 2 (เหลือง): <span id="score-player2">0</span> / 3</p>
         </div>
-        <div class="vs-area">
-            <h3>VS</h3>
-            <div class="sub-text">2 ใน 3</div>
-        </div>
-        <div id="p2-area" class="player-score">
-            <h3>เหลือง<span class="indicator p2-indic" style="margin-left:5px; margin-right:0;"></span></h3>
-            <div id="score2" class="score-count">0</div>
-        </div>
+
+        <div id="status" class="status-message">ตาของผู้เล่น 1 (แดง)</div>
+        
+        <div id="board" class="board">
+            </div>
+
+        <button id="reset-button">เริ่มเกมใหม่</button>
     </div>
 
-    <div id="board" class="game-board">
-        </div>
-
-    <div id="status">ตาของ สีแดง เดิน...</div>
-    <button id="reset-btn" class="action-btn">เริ่มเกมใหม่ (Reset Round)</button>
-
-    <div id="winModal" class="modal">
-        <div class="modal-content">
-            <h2 id="winnerText">ผู้เล่น สีแดง ชนะ!</h2>
-            <p>เป็นผู้ชนะในแมตช์นี้ (Best of 3)</p>
-            <button id="new-match-btn" class="action-btn">เล่นแมตช์ใหม่</button>
-        </div>
-    </div>
+    <audio id="drop-sound" src="drop.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="win.mp3" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>
