@@ -1,22 +1,47 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>บอร์ดเกม 4 in a row</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมเรียง 4 (Connect 4)</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>เกม 4 in a row</h1>
 
-  <div id="game">
-    <div id="current-player">ผู้เล่น: <span id="player">🔴</span></div>
-    <div id="buttons"></div>
-    <div id="board"></div>
-  </div>
+    <button id="theme-toggle" class="theme-btn">☀️ โหมดสว่าง</button>
 
-  <button onclick="resetGame()">เริ่มใหม่</button>
+    <h1>Connect 4</h1>
 
-  <script src="script.js"></script>
+    <div class="scoreboard">
+        <div id="p1-area" class="player-score active-turn">
+            <h3><span class="indicator p1-indic"></span>แดง</h3>
+            <div id="score1" class="score-count">0</div>
+        </div>
+        <div class="vs-area">
+            <h3>VS</h3>
+            <div class="sub-text">2 ใน 3</div>
+        </div>
+        <div id="p2-area" class="player-score">
+            <h3>เหลือง<span class="indicator p2-indic" style="margin-left:5px; margin-right:0;"></span></h3>
+            <div id="score2" class="score-count">0</div>
+        </div>
+    </div>
+
+    <div id="board" class="game-board">
+        </div>
+
+    <div id="status">ตาของ สีแดง เดิน...</div>
+    <button id="reset-btn" class="action-btn">เริ่มเกมใหม่ (Reset Round)</button>
+
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <h2 id="winnerText">ผู้เล่น สีแดง ชนะ!</h2>
+            <p>เป็นผู้ชนะในแมตช์นี้ (Best of 3)</p>
+            <button id="new-match-btn" class="action-btn">เล่นแมตช์ใหม่</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
