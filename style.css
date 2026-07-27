@@ -5,6 +5,54 @@ box-sizing:border-box;
 font-family:'Kanit',sans-serif;
 }
 
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#ffd6ec,#fff5fa);
+overflow:hidden;
+}
+
+.card{
+
+width:380px;
+background:white;
+padding:30px;
+border-radius:30px;
+text-align:center;
+box-shadow:0 15px 40px rgba(255,105,180,.3);
+position:relative;
+z-index:5;
+
+}
+
+h1{
+color:#ff4d88;
+margin-bottom:15px;
+}
+
+#typing{
+height:90px;
+font-size:20px;
+color:#555;
+margin-bottom:20px;
+}
+
+.bear{
+width:180px;
+margin:10px;
+animation:float 2s infinite ease-in-out;
+}
+
+@keyframes float{
+
+50%{
+transform:translateY(-10px);
+}
+
+}
+
 .btn-box{
 margin-top:25px;
 }
