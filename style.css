@@ -40,9 +40,9 @@ margin-bottom:20px;
 }
 
 .bear{
-width:180px;
-margin:10px;
-animation:float 2s infinite ease-in-out;
+    width:280px;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(255,105,180,.4);
 }
 
 @keyframes float{
