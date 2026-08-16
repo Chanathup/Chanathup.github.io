@@ -1,126 +1,173 @@
-const rows = 6;
-const cols = 7;
-let currentPlayer = "red";
-let board = [];
-let isGameOver = false;
-
-const boardDiv = document.getElementById("board");
-const buttonsLayer = document.getElementById("buttons-layer");
-const playerIndicator = document.getElementById("player-indicator");
-const winnerMessage = document.getElementById("winner-message");
-
-// สร้างปุ่มลูกศรด้านบน
-function createButtons() {
-  buttonsLayer.innerHTML = "";
-  for (let c = 0; c < cols; c++) {
-    const btn = document.createElement("button");
-    btn.className = "column-btn";
-    btn.onclick = () => dropPiece(c);
-    buttonsLayer.appendChild(btn);
-  }
+:root {
+  --board-color: #3b82f6;
+  --board-shadow: #1e40af;
+  --bg-color: #f0f9ff;
+  --red-piece: radial-gradient(circle at 30% 30%, #ff6b6b, #c0392b);
+  --yellow-piece: radial-gradient(circle at 30% 30%, #feca57, #f39c12);
+  --hole-shadow: inset 3px 3px 5px rgba(0,0,0,0.4);
 }
 
-// สร้างกระดาน
-function createBoard() {
-  board = [];
-  boardDiv.innerHTML = "";
-  for (let r = 0; r < rows; r++) {
-    board[r] = [];
-    for (let c = 0; c < cols; c++) {
-      board[r][c] = null;
-      const cell = document.createElement("div");
-      cell.classList.add("cell");
-      cell.dataset.row = r;
-      cell.dataset.col = c;
-      boardDiv.appendChild(cell);
-    }
-  }
+body {
+  font-family: "Prompt", sans-serif;
+  text-align: center;
+  background-color: var(--bg-color);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-// เริ่มเกมครั้งแรก
-createButtons();
-createBoard();
-
-function dropPiece(c) {
-  if (isGameOver) return; // ถ้าจบเกมแล้ว กดไม่ได้
-
-  for (let r = rows - 1; r >= 0; r--) {
-    if (!board[r][c]) {
-      // 1. ลงข้อมูลใน Logic
-      board[r][c] = currentPlayer;
-
-      // 2. แสดงผล (UI)
-      const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-      
-      // สร้าง element ลูกบอลแยกออกมาเพื่อทำ Animation
-      const piece = document.createElement("div");
-      piece.classList.add("piece");
-      cell.classList.add(currentPlayer); // ใส่ class สีให้ cell (เพื่ออ้างอิง)
-      cell.appendChild(piece); // ใส่ลูกบอลลงไป
-
-      // 3. ตรวจสอบผู้ชนะ
-      if (checkWin(r, c)) {
-        showWinner(currentPlayer);
-        isGameOver = true; // ล็อกเกม
-        return; // **สำคัญ** จบฟังก์ชันทันที ไม่มีการสลับสี
-      }
-
-      // 4. สลับตาผู้เล่น (ถ้ายังไม่มีใครชนะ)
-      currentPlayer = currentPlayer === "red" ? "yellow" : "red";
-      updatePlayerIndicator();
-      break;
-    }
-  }
+.container {
+  max-width: 600px;
+  width: 100%;
 }
 
-function updatePlayerIndicator() {
-  playerIndicator.className = `player-dot ${currentPlayer}`;
+h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
 }
 
-function showWinner(winner) {
-  const winnerName = winner === "red" ? "สีแดง (Red)" : "สีเหลือง (Yellow)";
-  winnerMessage.textContent = `🎉 ยินดีด้วย! ผู้เล่น ${winnerName} เป็นฝ่ายชนะ!`;
-  winnerMessage.classList.remove("hidden");
-  // เปลี่ยนสีกล่องข้อความตามผู้ชนะ
-  winnerMessage.style.backgroundColor = winner === "red" ? "#e74c3c" : "#f1c40f";
-  winnerMessage.style.color = winner === "red" ? "white" : "black";
+/* Status Bar & Reset Button */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-// ตรวจสอบเงื่อนไขชนะ
-function checkWin(row, col) {
-  return (
-    checkDir(row, col, 1, 0) || // แนวนอน
-    checkDir(row, col, 0, 1) || // แนวตั้ง
-    checkDir(row, col, 1, 1) || // แนวทแยงลงขวา
-    checkDir(row, col, 1, -1)   // แนวทแยงลงซ้าย
-  );
+#current-player-display {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
-function checkDir(row, col, rowDir, colDir) {
-  let count = 1;
-  const current = board[row][col]; // สีของคนที่เพิ่งวาง
+.player-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 10px;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+.player-dot.red { background: var(--red-piece); }
+.player-dot.yellow { background: var(--yellow-piece); }
 
-  // เดินหน้า
-  for (let i = 1; i < 4; i++) {
-    const r = row + i * rowDir;
-    const c = col + i * colDir;
-    if (r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] !== current) break;
-    count++;
-  }
-  // ถอยหลัง
-  for (let i = 1; i < 4; i++) {
-    const r = row - i * rowDir;
-    const c = col - i * colDir;
-    if (r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] !== current) break;
-    count++;
-  }
-  return count >= 4;
+.reset-btn {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Prompt", sans-serif;
+  transition: transform 0.1s, background-color 0.2s;
 }
 
-function resetGame() {
-  createBoard();
-  currentPlayer = "red";
-  isGameOver = false;
-  updatePlayerIndicator();
-  winnerMessage.classList.add("hidden");
+.reset-btn:hover { background-color: #2c3e50; }
+.reset-btn:active { transform: scale(0.95); }
+
+/* Game Area */
+#game-area {
+  position: relative;
+  display: inline-block;
+  background-color: var(--board-color);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 10px 0 var(--board-shadow);
+}
+
+/* Drop Buttons (Arrows) */
+#buttons-layer {
+  display: grid;
+  grid-template-columns: repeat(7, 60px);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.column-btn {
+  width: 60px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.column-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+.column-btn:active { transform: translateY(0); }
+.column-btn::after { content: "▼"; }
+
+/* Board Grid */
+#board {
+  display: grid;
+  grid-template-columns: repeat(7, 60px);
+  grid-template-rows: repeat(6, 60px);
+  gap: 8px;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #bg-color; /* Matches body bg to look like a hole */
+  background: white; /* Fallback */
+  box-shadow: var(--hole-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* For animation containment */
+}
+
+/* Pieces */
+.piece {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translateY(-300px); /* Start above */
+  animation: dropIn 0.5s ease-out forwards;
+}
+
+.cell.red .piece { background: var(--red-piece); }
+.cell.yellow .piece { background: var(--yellow-piece); }
+
+@keyframes dropIn {
+  0% { transform: translateY(-400px); }
+  60% { transform: translateY(10px); }
+  80% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+/* Winner Message */
+#winner-message {
+  background-color: #27ae60;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  animation: popIn 0.3s ease-out;
+}
+
+#winner-message.hidden { display: none; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
